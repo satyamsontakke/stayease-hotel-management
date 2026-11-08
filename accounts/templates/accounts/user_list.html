@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<h1>Registered Users</h1>
+
+<form method="get" style="margin-bottom:16px; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+  <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search name, username, email" style="flex:1; min-width:220px; width:auto;">
+  <select name="role" style="width:auto; min-width:150px;">
+    <option value="">All roles</option>
+    <option value="ADMIN" {% if request.GET.role == 'ADMIN' %}selected{% endif %}>Admin</option>
+    <option value="STAFF" {% if request.GET.role == 'STAFF' %}selected{% endif %}>Staff</option>
+    <option value="CUSTOMER" {% if request.GET.role == 'CUSTOMER' %}selected{% endif %}>Customer</option>
+  </select>
+  <button type="submit" style="width:auto;">Filter</button>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Joined</th>
+      <th>Change role</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for u in users %}
+    <tr>
+      <td>{{ u.username }}</td>
+      <td>{{ u.get_full_name|default:"-" }}</td>
+      <td>{{ u.email|default:"-" }}</td>
+      <td>{% if u.is_superuser %}Admin{% else %}{{ u.profile.get_role_display }}{% endif %}</td>
+      <td>{{ u.date_joined|date:"d M Y" }}</td>
+      <td>
+        {% if u.is_superuser or u.pk == request.user.pk %}
+          -
+        {% else %}
+        <form method="post" action="{% url 'user_role_update' u.pk %}" style="display:flex; gap:6px; align-items:center;">
+          {% csrf_token %}
+          <select name="role" style="width:auto; min-width:110px;">
+            <option value="CUSTOMER" {% if u.profile.role == 'CUSTOMER' %}selected{% endif %}>Customer</option>
+            <option value="STAFF" {% if u.profile.role == 'STAFF' %}selected{% endif %}>Staff</option>
+            <option value="ADMIN" {% if u.profile.role == 'ADMIN' %}selected{% endif %}>Admin</option>
+          </select>
+          <button type="submit" style="width:auto;">Save</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">No users found.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

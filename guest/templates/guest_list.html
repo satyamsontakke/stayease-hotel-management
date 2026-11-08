@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Guests{% endblock title %}
+
+{% block content %}
+
+<style>
+.page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.page-head .titlex { margin: 0; }
+.count-pill { color: var(--muted); font-size: 14px; }
+
+.search-bar { display: flex; gap: 10px; max-width: 520px; margin-bottom: 20px; }
+.search-bar input { flex: 1; }
+.search-bar .btn { white-space: nowrap; }
+
+.guest-cell { display: flex; align-items: center; gap: 12px; }
+
+.mini-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+    color: var(--navy-900);
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.guest-cell small { display: block; color: var(--muted); }
+
+.row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.row-actions a {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    color: var(--navy-800);
+    background: #fff;
+    transition: .15s;
+}
+
+.row-actions a:hover { border-color: var(--gold-500); background: var(--gold-100); }
+.row-actions a.del { color: var(--bad); }
+.row-actions a.del:hover { border-color: var(--bad); background: var(--bad-bg); }
+
+.table-wrap { overflow-x: auto; }
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--surface);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    color: var(--muted);
+}
+</style>
+
+<div class="page-head">
+    <div>
+        <h2 class="titlex">👥 Guests</h2>
+        <span class="count-pill">{{ page_obj.paginator.count }} total</span>
+    </div>
+    <a href="{% url 'guest_create' %}" class="btn btn-gold">+ Add New Guest</a>
+</div>
+
+<form method="get" class="search-bar">
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search by name, phone or email">
+    <button type="submit" class="btn">Search</button>
+    {% if request.GET.q %}
+    <a class="btn" style="background:#6b7385" href="{% url 'guest_list' %}">Clear</a>
+    {% endif %}
+</form>
+
+{% if guests %}
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Guest</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for guest in guests %}
+            <tr>
+                <td>
+                    <div class="guest-cell">
+                        <div class="mini-avatar">{{ guest.first_name|slice:":1"|upper }}</div>
+                        <div>
+                            <strong>{{ guest.first_name }} {{ guest.last_name }}</strong>
+                            <small>#{{ guest.id }}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>{{ guest.phone_number }}</td>
+                <td>{{ guest.email }}</td>
+                <td>
+                    <div class="row-actions">
+                        <a href="{% url 'guest_detail' guest.pk %}">View</a>
+                        <a href="{% url 'guest_update' guest.pk %}">Edit</a>
+                        <a href="{% url 'guest_delete' guest.pk %}" class="del">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    {% if request.GET.q %}
+        <p>No guests match "{{ request.GET.q }}" 😕</p>
+    {% else %}
+        <p>No guest records found 😕</p>
+        <a href="{% url 'guest_create' %}" class="btn btn-gold">Add First Guest</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock content %}
+
+{% block pagination %}
+{% if is_paginated %}
+<ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li><a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}">&laquo;</a></li>
+    {% endif %}
+
+    <li class="active"><a href="#">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</a></li>
+
+    {% if page_obj.has_next %}
+    <li><a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}">&raquo;</a></li>
+    {% endif %}
+</ul>
+{% endif %}
+{% endblock pagination %}

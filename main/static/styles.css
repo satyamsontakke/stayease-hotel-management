@@ -1,0 +1,462 @@
+/* =========================================================
+   StayEase  |  Navy + Gold theme
+   ========================================================= */
+
+:root {
+    --navy-900: #081628;
+    --navy-800: #0b1f3a;
+    --navy-700: #12305a;
+    --navy-600: #1b4278;
+    --gold-500: #c9a227;
+    --gold-400: #e0b93e;
+    --gold-100: #faf3d9;
+    --bg: #f5f3ee;
+    --surface: #ffffff;
+    --text: #1d2433;
+    --muted: #6b7385;
+    --line: #e6e2d8;
+    --ok: #1f8a5b;
+    --ok-bg: #e4f5ec;
+    --bad: #c0392b;
+    --bad-bg: #fbe9e6;
+    --radius: 14px;
+    --shadow: 0 2px 6px rgba(8, 22, 40, .06), 0 10px 30px rgba(8, 22, 40, .06);
+    --sidebar-w: 260px;
+
+    /* old variable names, so existing page CSS keeps working */
+    --primary-color: var(--navy-800);
+    --secondary-color: var(--gold-500);
+    --light-bg: var(--bg);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    color: var(--navy-800);
+    margin-top: 0;
+}
+
+a { color: var(--navy-600); }
+
+/* ---------------- Layout ---------------- */
+
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body.has-sidebar .app { margin-left: var(--sidebar-w); }
+
+.container {
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 32px;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+/* ---------------- Sidebar ---------------- */
+
+.sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: var(--sidebar-w);
+    background: linear-gradient(180deg, var(--navy-800), var(--navy-900));
+    color: #dbe3f1;
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+    overflow-y: auto;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 22px 20px;
+    text-decoration: none;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.brand-mark {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+    color: var(--navy-900);
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.brand-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.brand-text small {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--gold-400);
+    margin-top: 4px;
+}
+
+.side-nav { padding: 14px 12px; flex: 1; }
+
+.side-title {
+    margin: 18px 10px 6px;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(219, 227, 241, .5);
+}
+
+.side-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    margin: 2px 0;
+    border-radius: 10px;
+    color: #dbe3f1;
+    text-decoration: none;
+    font-size: 14.5px;
+    font-weight: 500;
+    transition: background .15s, color .15s;
+}
+
+.side-link .ico { width: 22px; text-align: center; }
+
+.side-link:hover { background: rgba(255, 255, 255, .07); color: #fff; }
+
+.side-link.active {
+    background: rgba(201, 162, 39, .16);
+    color: var(--gold-400);
+    box-shadow: inset 3px 0 0 var(--gold-500);
+}
+
+.side-user {
+    padding: 14px 12px 18px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.user-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #fff;
+}
+
+.user-chip:hover, .user-chip.active { background: rgba(255, 255, 255, .07); }
+
+.avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--gold-500);
+    color: var(--navy-900);
+    font-weight: 700;
+}
+
+.user-meta strong { display: block; font-size: 14px; }
+.user-meta small { color: var(--gold-400); font-size: 12px; }
+
+.logout-form { display: block; margin: 8px 0 0; }
+
+.logout-form button {
+    width: 100%;
+    padding: 9px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, .18);
+    background: transparent;
+    color: #dbe3f1;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: .15s;
+}
+
+.logout-form button:hover { background: var(--bad); border-color: var(--bad); color: #fff; }
+
+/* ---------------- Top bar ---------------- */
+
+.topbar {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 18px;
+    background: var(--navy-800);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+}
+
+body.guest-view .topbar { display: flex; justify-content: space-between; padding: 14px 32px; }
+
+.topbar-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+}
+
+.top-links { display: flex; gap: 12px; align-items: center; }
+.top-links a { color: #dbe3f1; text-decoration: none; font-weight: 500; }
+.top-links a:hover { color: var(--gold-400); }
+
+.menu-btn {
+    background: none; border: 0; color: #fff;
+    font-size: 24px; cursor: pointer; padding: 0 4px;
+}
+
+.scrim { display: none; }
+
+/* ---------------- Cards / generic blocks ---------------- */
+
+.panel, .room-card, .detail-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+}
+
+.titlex {
+    font-family: 'Playfair Display', serif;
+    color: var(--navy-800);
+    font-size: 30px;
+    margin: 0 0 22px;
+}
+
+/* ---------------- Tables ---------------- */
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+th {
+    background: var(--navy-800);
+    color: #fff;
+    text-align: left;
+    font-size: 12.5px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 13px 16px;
+}
+
+td { padding: 13px 16px; border-top: 1px solid var(--line); }
+
+tbody tr:hover td { background: var(--gold-100); }
+
+/* ---------------- Buttons & links ---------------- */
+
+.btn, .btn-gold, button[type="submit"], .linkx {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: var(--navy-800);
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform .15s, background .15s, box-shadow .15s;
+}
+
+.btn:hover, button[type="submit"]:hover, .linkx:hover {
+    background: var(--navy-700);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(8, 22, 40, .18);
+    color: #fff;
+}
+
+.btn-gold, .top-links a.btn-gold {
+    background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+    color: var(--navy-900);
+}
+
+.btn-gold:hover { color: var(--navy-900); background: var(--gold-400); }
+
+/* ---------------- Forms ---------------- */
+
+main form { max-width: 640px; }
+
+label { display: block; margin: 14px 0 6px; font-weight: 600; font-size: 14px; color: var(--navy-800); }
+
+input[type="text"], input[type="email"], input[type="password"], input[type="number"],
+input[type="date"], input[type="tel"], select, textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid #d6d1c4;
+    border-radius: 10px;
+    background: #fff;
+    font: inherit;
+    color: var(--text);
+    transition: border-color .15s, box-shadow .15s;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--gold-500);
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, .22);
+}
+
+.helptext, .errorlist { font-size: 13px; }
+.errorlist { list-style: none; padding: 0; margin: 4px 0; color: var(--bad); }
+
+/* ---------------- Status badges ---------------- */
+
+.status {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.status.available { background: var(--ok-bg); color: var(--ok); }
+.status.booked { background: var(--bad-bg); color: var(--bad); }
+
+/* ---------------- Messages ---------------- */
+
+.messages { list-style: none; padding: 0; margin: 0 0 20px; }
+
+.messages li {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    background: var(--gold-100);
+    border-color: #ead9a0;
+    color: #6b5510;
+}
+
+.messages li.success { background: var(--ok-bg); border-color: #b8e2cb; color: var(--ok); }
+.messages li.error { background: var(--bad-bg); border-color: #f1c5bf; color: var(--bad); }
+
+/* ---------------- Pagination ---------------- */
+
+.pagination {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 0;
+    margin: 28px 0 0;
+}
+
+.pagination a {
+    display: block;
+    min-width: 38px;
+    padding: 8px 12px;
+    text-align: center;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--navy-800);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.pagination a:hover { border-color: var(--gold-500); }
+
+.pagination .active a { background: var(--navy-800); border-color: var(--navy-800); color: #fff; }
+
+/* ---------------- Footer ---------------- */
+
+.footer {
+    text-align: center;
+    padding: 18px;
+    color: var(--muted);
+    font-size: 13.5px;
+    border-top: 1px solid var(--line);
+}
+
+.footer p { margin: 0; }
+.footer .linky { color: var(--navy-700); font-weight: 600; text-decoration: none; }
+.footer .linky:hover { color: var(--gold-500); }
+
+/* ---------------- Mobile ---------------- */
+
+@media (max-width: 900px) {
+    body.has-sidebar .app { margin-left: 0; }
+    body.has-sidebar .topbar { display: flex; }
+
+    .sidebar { transform: translateX(-100%); transition: transform .25s ease; }
+    body.menu-open .sidebar { transform: translateX(0); box-shadow: 0 0 40px rgba(0, 0, 0, .4); }
+
+    body.menu-open .scrim {
+        display: block;
+        position: fixed; inset: 0;
+        background: rgba(8, 22, 40, .5);
+        z-index: 45;
+    }
+
+    .container { padding: 20px 16px; }
+    body.guest-view .topbar { padding: 12px 16px; }
+
+    table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+
+.res-notes {
+    margin: 24px 27px 20px;
+    padding: 16px 20px;
+    background: #fbf6e4;
+    border: 1px solid #ecdca0;
+    border-left: 4px solid #c9a227;
+    border-radius: 12px;
+}
+
+.res-notes-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.res-notes-text {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #0b1f3a;
+}

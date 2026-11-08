@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} | StayEase</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+
+<body class="{% if user.is_authenticated %}has-sidebar{% else %}guest-view{% endif %}">
+
+{% if user.is_authenticated %}
+{% with current=request.resolver_match.url_name %}
+
+<aside class="sidebar" id="sidebar">
+
+    <a class="brand" href="{% url 'dashboard' %}">
+        <span class="brand-mark">S</span>
+        <span class="brand-text">StayEase<small>Hotel Management</small></span>
+    </a>
+
+    <nav class="side-nav">
+
+        <a class="side-link {% if current == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+            <span class="ico">🏠</span> Dashboard
+        </a>
+
+        {% if user.is_superuser or user.profile.role == 'ADMIN' or user.profile.role == 'STAFF' %}
+
+            <div class="side-title">Manage</div>
+
+            <a class="side-link {% if current == 'room_list' %}active{% endif %}" href="{% url 'room_list' %}">
+                <span class="ico">🛏️</span> Rooms
+            </a>
+            <a class="side-link {% if current == 'guest_list' %}active{% endif %}" href="{% url 'guest_list' %}">
+                <span class="ico">👥</span> Guests
+            </a>
+            <a class="side-link {% if current == 'reservation_list' %}active{% endif %}" href="{% url 'reservation_list' %}">
+                <span class="ico">📒</span> Reservations
+            </a>
+            <a class="side-link {% if current == 'reservation_history' %}active{% endif %}" href="{% url 'reservation_history' %}">
+                <span class="ico">🕘</span> History
+            </a>
+
+            {% if user.is_superuser or user.profile.role == 'ADMIN' %}
+            <a class="side-link {% if current == 'user_list' %}active{% endif %}" href="{% url 'user_list' %}">
+                <span class="ico">🧑‍💼</span> Users
+            </a>
+            {% endif %}
+
+            <div class="side-title">Rooms Status</div>
+
+            <a class="side-link {% if current == 'calendar' %}active{% endif %}" href="{% url 'calendar' %}">
+                <span class="ico">📅</span> Calendar
+            </a>
+            <a class="side-link {% if current == 'available_rooms' %}active{% endif %}" href="{% url 'available_rooms' %}">
+                <span class="ico">✅</span> Available
+            </a>
+            <a class="side-link {% if current == 'booked_rooms' %}active{% endif %}" href="{% url 'booked_rooms' %}">
+                <span class="ico">🔒</span> Booked
+            </a>
+            <a class="side-link {% if current == 'search_rooms' %}active{% endif %}" href="{% url 'search_rooms' %}">
+                <span class="ico">🔍</span> Search by Date
+            </a>
+
+            <div class="side-title">Quick Add</div>
+
+            {% if user.is_superuser or user.profile.role == 'ADMIN' %}
+            <a class="side-link {% if current == 'room_create' %}active{% endif %}" href="{% url 'room_create' %}">
+                <span class="ico">➕</span> Add Room
+            </a>
+            {% endif %}
+            <a class="side-link {% if current == 'guest_create' %}active{% endif %}" href="{% url 'guest_create' %}">
+                <span class="ico">➕</span> Add Guest
+            </a>
+            <a class="side-link {% if current == 'reservation_create' %}active{% endif %}" href="{% url 'reservation_create' %}">
+                <span class="ico">➕</span> Add Reservation
+            </a>
+
+        {% elif user.profile.role == 'CUSTOMER' %}
+
+            <div class="side-title">Book a Stay</div>
+
+            <a class="side-link {% if current == 'available_rooms' %}active{% endif %}" href="{% url 'available_rooms' %}">
+                <span class="ico">✅</span> Available Rooms
+            </a>
+            <a class="side-link {% if current == 'search_rooms' %}active{% endif %}" href="{% url 'search_rooms' %}">
+                <span class="ico">🔍</span> Search by Date
+            </a>
+            <a class="side-link {% if current == 'reservation_create' %}active{% endif %}" href="{% url 'reservation_create' %}">
+                <span class="ico">➕</span> New Reservation
+            </a>
+
+            <div class="side-title">My Bookings</div>
+
+            <a class="side-link {% if current == 'reservation_list' %}active{% endif %}" href="{% url 'reservation_list' %}">
+                <span class="ico">📒</span> My Reservations
+            </a>
+            <a class="side-link {% if current == 'reservation_history' %}active{% endif %}" href="{% url 'reservation_history' %}">
+                <span class="ico">🕘</span> Booking History
+            </a>
+
+        {% endif %}
+
+    </nav>
+
+    <div class="side-user">
+        <a class="user-chip {% if current == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
+            <span class="avatar">{{ user.username|slice:":1"|upper }}</span>
+            <span class="user-meta">
+                <strong>{{ user.get_full_name|default:user.username }}</strong>
+                <small>
+                    {% if user.is_superuser %}Admin{% else %}{{ user.profile.get_role_display }}{% endif %}
+                </small>
+            </span>
+        </a>
+        <form action="{% url 'logout' %}" method="POST" class="logout-form">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+
+</aside>
+
+<div class="scrim" id="scrim"></div>
+
+{% endwith %}
+{% endif %}
+
+<div class="app">
+
+    <header class="topbar">
+        {% if user.is_authenticated %}
+        <button class="menu-btn" id="menuBtn" type="button" aria-label="Menu">☰</button>
+        {% endif %}
+        <a class="topbar-brand" href="{% url 'dashboard' %}">StayEase</a>
+
+        {% if not user.is_authenticated %}
+        <nav class="top-links">
+            <a href="{% url 'login' %}?next={{ request.path }}">Login</a>
+            <a class="btn-gold" href="{% url 'register' %}">Register</a>
+        </nav>
+        {% endif %}
+    </header>
+
+    <main class="container">
+
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+
+        {% block pagination %}
+        {% if is_paginated %}
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li><a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+            <li><a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
+            {% endif %}
+
+            <li class="active"><a href="#">{{ page_obj.number }}</a></li>
+
+            {% if page_obj.has_next %}
+            <li><a href="{{ request.path }}?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
+            <li><a href="{{ request.path }}?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+            {% endif %}
+        </ul>
+        {% endif %}
+        {% endblock %}
+
+    </main>
+
+    <footer class="footer">
+        <p>© Created by <a class="linky" href="{% url 'modd' %}">SATYAM SONTAKKE</a></p>
+    </footer>
+
+</div>
+
+<script>
+(function () {
+    var body = document.body;
+    var btn = document.getElementById('menuBtn');
+    var scrim = document.getElementById('scrim');
+    if (btn) btn.addEventListener('click', function () { body.classList.toggle('menu-open'); });
+    if (scrim) scrim.addEventListener('click', function () { body.classList.remove('menu-open'); });
+})();
+</script>
+
+</body>
+</html>

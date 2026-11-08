@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Available Rooms{% endblock %}
+
+{% block content %}
+
+<style>
+.room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+
+.room-tile {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform .18s, box-shadow .18s;
+}
+
+.room-tile:hover { transform: translateY(-5px); box-shadow: 0 16px 36px rgba(8, 22, 40, .14); }
+
+.room-top {
+    background: linear-gradient(135deg, var(--navy-800), var(--navy-600));
+    color: #fff;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.room-no { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 700; line-height: 1; }
+.room-no small { display: block; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold-400); margin-bottom: 6px; font-weight: 500; }
+
+.room-body { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.room-type { font-size: 16px; font-weight: 600; color: var(--navy-800); }
+.room-price { color: var(--muted); font-size: 14px; }
+.room-price strong { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--navy-800); }
+.room-btns { display: flex; gap: 8px; margin-top: auto; }
+.room-btns .btn { flex: 1; text-align: center; padding: 9px 10px; }
+
+.empty-state {
+    text-align: center; padding: 60px 20px;
+    background: var(--surface); border: 1px dashed var(--line);
+    border-radius: var(--radius); color: var(--muted);
+}
+</style>
+
+<h2 class="titlex">🟢 Available Rooms <span style="font-size:16px; color:var(--muted); font-family:'Inter',sans-serif;">today</span></h2>
+
+{% if rooms %}
+<div class="room-grid">
+    {% for room in rooms %}
+    <div class="room-tile">
+        <div class="room-top">
+            <div class="room-no"><small>Room</small>{{ room.room_number }}</div>
+            <span class="status available">Available</span>
+        </div>
+        <div class="room-body">
+            <div class="room-type">{{ room.room_type }}</div>
+            <div class="room-price"><strong>₹ {{ room.price_per_night }}</strong> / night</div>
+            <div class="room-btns">
+                <a class="btn" href="{% url 'room_detail' room.id %}">Details</a>
+                <a class="btn btn-gold" href="{% url 'reservation_create' %}?room_id={{ room.id }}">Book</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>❌ No rooms available right now</p>
+</div>
+{% endif %}
+
+{% endblock %}

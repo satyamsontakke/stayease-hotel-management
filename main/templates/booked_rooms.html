@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Booked Rooms{% endblock %}
+
+{% block content %}
+
+<style>
+.room-chip { background: var(--navy-800); color: #fff; border-radius: 8px; padding: 3px 10px; font-weight: 600; font-size: 13px; }
+.table-wrap { overflow-x: auto; }
+.empty-state {
+    text-align: center; padding: 60px 20px;
+    background: var(--surface); border: 1px dashed var(--line);
+    border-radius: var(--radius); color: var(--muted);
+}
+</style>
+
+<h2 class="titlex">🔴 Booked Rooms <span style="font-size:16px; color:var(--muted); font-family:'Inter',sans-serif;">today</span></h2>
+
+{% if reservations %}
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Room</th>
+                <th>Guest</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in reservations %}
+            <tr>
+                <td><span class="room-chip">{{ r.room.room_number }}</span></td>
+                <td>{{ r.guest.first_name }} {{ r.guest.last_name }}</td>
+                <td>{{ r.check_in_date|date:"d M Y" }}</td>
+                <td>{{ r.check_out_date|date:"d M Y" }}</td>
+                <td><a href="{% url 'reservation_detail' r.pk %}">View</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <p>✅ No rooms are booked right now</p>
+</div>
+{% endif %}
+
+{% endblock %}

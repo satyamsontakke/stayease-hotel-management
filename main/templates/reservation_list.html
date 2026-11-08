@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Reservations{% endblock %}
+
+{% block content %}
+
+<style>
+.page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.page-head .titlex { margin: 0; }
+
+.tabs { display: inline-flex; background: #ebe7dc; border-radius: 12px; padding: 4px; margin-bottom: 20px; }
+
+.tabs a {
+    padding: 8px 18px;
+    border-radius: 9px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.tabs a.on { background: var(--navy-800); color: #fff; }
+
+.st {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.st-confirmed   { background: var(--gold-100); color: #7a5f0a; }
+.st-checked_in  { background: var(--ok-bg);    color: var(--ok); }
+.st-checked_out { background: #ececec;         color: #555; }
+.st-cancelled   { background: var(--bad-bg);   color: var(--bad); }
+
+.room-chip {
+    background: var(--navy-800);
+    color: #fff;
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.table-wrap { overflow-x: auto; }
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--surface);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    color: var(--muted);
+}
+</style>
+
+{% with current=request.resolver_match.url_name %}
+
+<div class="page-head">
+    <h2 class="titlex">
+        {% if current == 'reservation_history' %}🕘 Booking History{% else %}📒 Reservations{% endif %}
+    </h2>
+    <a href="{% url 'reservation_create' %}" class="btn btn-gold">+ New Reservation</a>
+</div>
+
+<div class="tabs">
+    <a href="{% url 'reservation_list' %}" class="{% if current != 'reservation_history' %}on{% endif %}">Active</a>
+    <a href="{% url 'reservation_history' %}" class="{% if current == 'reservation_history' %}on{% endif %}">History</a>
+</div>
+
+{% endwith %}
+
+{% if reservations %}
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Room</th>
+                <th>Guest</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Nights</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td><span class="room-chip">{{ reservation.room.room_number }}</span></td>
+                <td>{{ reservation.guest.first_name }} {{ reservation.guest.last_name }}</td>
+                <td>{{ reservation.check_in_date|date:"d M Y" }}</td>
+                <td>{{ reservation.check_out_date|date:"d M Y" }}</td>
+                <td>{{ reservation.nights }}</td>
+                <td><span class="st st-{{ reservation.state|lower }}">{{ reservation.status }}</span></td>
+                <td><a href="{% url 'reservation_detail' reservation.id %}">View</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No reservations found 😔</p>
+    <a href="{% url 'reservation_create' %}" class="btn btn-gold">Create a Reservation</a>
+</div>
+{% endif %}
+
+{% endblock %}

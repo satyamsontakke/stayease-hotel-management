@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar{% endblock %}
+
+{% block content %}
+
+<style>
+.cal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.cal-head .titlex { margin: 0; }
+
+.cal-nav { display: flex; align-items: center; gap: 8px; }
+.cal-nav .range { font-weight: 600; color: var(--navy-800); padding: 0 8px; }
+
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13.5px; color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; margin-right: 6px; vertical-align: -2px; }
+
+.cal-scroll {
+    overflow-x: auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.cal-table { border: 0; border-radius: 0; box-shadow: none; min-width: 900px; table-layout: fixed; }
+
+.cal-table th, .cal-table td { padding: 0; text-align: center; }
+
+.cal-table th {
+    padding: 10px 4px;
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.cal-table th small { display: block; font-weight: 400; opacity: .75; letter-spacing: 0; text-transform: none; font-size: 11px; }
+.cal-table th.today { background: var(--gold-500); color: var(--navy-900); }
+.cal-table th.weekend { background: var(--navy-700); }
+
+.cal-table .roomcol {
+    width: 110px;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: #fff;
+    text-align: left;
+    padding: 10px 14px;
+    border-right: 1px solid var(--line);
+}
+
+.cal-table thead .roomcol { background: var(--navy-800); z-index: 3; }
+
+.cal-table .roomcol strong { color: var(--navy-800); display: block; }
+.cal-table .roomcol small { color: var(--muted); font-size: 12px; }
+
+.cal-table tbody tr:hover td { background: transparent; }
+
+.cal-table td { border-left: 1px solid var(--line); height: 54px; }
+.cal-table td.today { box-shadow: inset 0 0 0 2px var(--gold-500); }
+
+.cell {
+    height: 100%;
+    min-height: 54px;
+    padding: 6px 4px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.cell.free { color: transparent; background: #f3faf6; transition: .15s; }
+.cell.free:hover { background: var(--ok-bg); color: var(--ok); }
+
+.cell.booked { background: #f6d8d3; color: #8a2a1e; border-left: 3px solid var(--bad); }
+.cell.booked:hover { background: #f0c5be; }
+
+.empty-state { text-align: center; padding: 40px; color: var(--muted); }
+</style>
+
+<div class="cal-head">
+    <h2 class="titlex">📅 Booking Calendar</h2>
+
+    <div class="cal-nav">
+        <a class="btn" href="?start={{ prev_start|date:'Y-m-d' }}">&larr; Prev</a>
+        <span class="range">{{ start|date:"d M" }} – {{ last_day|date:"d M Y" }}</span>
+        <a class="btn" href="?start={{ next_start|date:'Y-m-d' }}">Next &rarr;</a>
+        <a class="btn btn-gold" href="{% url 'calendar' %}">Today</a>
+    </div>
+</div>
+
+<div class="legend">
+    <span><i style="background:#f3faf6; border:1px solid #bfe3cf"></i>Free (click to book)</span>
+    <span><i style="background:#f6d8d3; border-left:3px solid var(--bad)"></i>Booked (click for details)</span>
+    <span><i style="background:var(--gold-500)"></i>Today</span>
+</div>
+
+{% if rows %}
+<div class="cal-scroll">
+    <table class="cal-table">
+        <thead>
+            <tr>
+                <th class="roomcol">Room</th>
+                {% for day in days %}
+                <th class="{% if day == today %}today{% endif %} {% with w=day|date:'w' %}{% if w == '0' or w == '6' %}weekend{% endif %}{% endwith %}">
+                    {{ day|date:"D" }}
+                    <small>{{ day|date:"d M" }}</small>
+                </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td class="roomcol">
+                    <strong>{{ row.room.room_number }}</strong>
+                    <small>{{ row.room.room_type }}</small>
+                </td>
+
+                {% for cell in row.cells %}
+                <td class="{% if cell.date == today %}today{% endif %}">
+                    {% if cell.booking %}
+                    <a class="cell booked"
+                       href="{% url 'reservation_detail' cell.booking.pk %}"
+                       title="{{ cell.booking.guest.first_name }} {{ cell.booking.guest.last_name }} ({{ cell.booking.check_in_date|date:'d M' }} – {{ cell.booking.check_out_date|date:'d M' }})">
+                        {{ cell.booking.guest.first_name }}
+                    </a>
+                    {% else %}
+                    <a class="cell free"
+                       href="{% url 'reservation_create' %}?room_id={{ row.room.pk }}"
+                       title="Available - click to book">+</a>
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">No rooms added yet.</div>
+{% endif %}
+
+{% endblock %}

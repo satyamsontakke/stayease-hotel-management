@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Registration{% endblock %}
+
+{% block content %}
+
+<style>
+.auth-wrap { display: flex; justify-content: center; padding: 24px 0 40px; }
+
+.auth-card {
+    width: 100%;
+    max-width: 560px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.auth-head {
+    background: linear-gradient(160deg, var(--navy-800), var(--navy-900));
+    padding: 28px 34px;
+}
+
+.auth-head h2 { color: #fff; margin: 0 0 4px; font-size: 28px; }
+.auth-head p { color: var(--gold-400); margin: 0; font-size: 14px; }
+
+.auth-body { padding: 8px 34px 34px; }
+main .auth-body form { max-width: none; }
+
+.field .hint { color: var(--muted); font-size: 13px; margin-top: 5px; }
+.field .hint ul { margin: 4px 0 0; padding-left: 18px; }
+.field .err { color: var(--bad); font-size: 13px; margin-top: 5px; font-weight: 500; }
+.field.has-error input { border-color: var(--bad); }
+
+.auth-submit { width: 100%; margin-top: 26px; padding: 13px; font-size: 15px;
+    background: linear-gradient(135deg, var(--gold-400), var(--gold-500)); color: var(--navy-900); }
+.auth-submit:hover { background: var(--gold-400); color: var(--navy-900); }
+
+.auth-alt { text-align: center; margin-top: 22px; color: var(--muted); font-size: 14px; }
+.auth-alt a { color: var(--navy-700); font-weight: 600; text-decoration: none; }
+.auth-alt a:hover { color: var(--gold-500); }
+
+@media (max-width: 600px) {
+    .auth-head, .auth-body { padding-left: 20px; padding-right: 20px; }
+}
+</style>
+
+<div class="auth-wrap">
+    <div class="auth-card">
+
+        <div class="auth-head">
+            <h2>Create Customer Account</h2>
+            <p>Register to book rooms and manage your stays</p>
+        </div>
+
+        <div class="auth-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                {% for field in form %}
+                <div class="field {% if field.errors %}has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+
+                    {% if field.help_text %}
+                    <div class="hint">{{ field.help_text|safe }}</div>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                    <div class="err">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="btn auth-submit">Register</button>
+            </form>
+
+            <div class="auth-alt">
+                Already have an account? <a href="{% url 'login' %}">Login here</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

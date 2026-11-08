@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Invoice INV-{{ reservation.id|stringformat:"05d" }}{% endblock %}
+
+{% block content %}
+
+<style>
+.inv-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.inv-bar button.btn-gold {
+    background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+    color: var(--navy-900);
+}
+
+.invoice {
+    max-width: 820px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 40px 44px;
+}
+
+.inv-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-bottom: 22px;
+    border-bottom: 3px solid var(--gold-500);
+}
+
+.inv-brand { display: flex; align-items: center; gap: 14px; }
+
+.inv-mark {
+    width: 54px; height: 54px;
+    border-radius: 14px;
+    display: grid; place-items: center;
+    background: var(--navy-800);
+    color: var(--gold-400);
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.inv-brand h2 { margin: 0; font-size: 26px; }
+.inv-brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+.inv-meta { text-align: right; }
+.inv-meta h3 { margin: 0 0 6px; font-size: 30px; letter-spacing: .08em; color: var(--navy-800); }
+.inv-meta p { margin: 2px 0; font-size: 14px; color: var(--muted); }
+.inv-meta strong { color: var(--text); }
+
+.inv-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 26px 0; }
+
+.inv-box h4 {
+    margin: 0 0 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.inv-box p { margin: 2px 0; font-size: 15px; }
+.inv-box .name { font-size: 17px; font-weight: 600; color: var(--navy-800); }
+
+.invoice table { box-shadow: none; border-radius: 10px; }
+.invoice td.num, .invoice th.num { text-align: right; }
+
+.inv-total { display: flex; justify-content: flex-end; margin-top: 18px; }
+
+.inv-total table { width: 300px; border: 0; }
+.inv-total td { border: 0; padding: 7px 4px; }
+.inv-total tr:hover td { background: transparent; }
+.inv-total .grand td {
+    border-top: 2px solid var(--navy-800);
+    padding-top: 12px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy-800);
+}
+
+.inv-note { margin-top: 30px; padding-top: 18px; border-top: 1px dashed var(--line); text-align: center; color: var(--muted); font-size: 13.5px; }
+
+@media (max-width: 640px) {
+    .invoice { padding: 24px 18px; }
+    .inv-meta { text-align: left; }
+    .inv-cols { grid-template-columns: 1fr; }
+}
+
+@media print {
+    .sidebar, .topbar, .footer, .scrim, .no-print, .messages { display: none !important; }
+    body, body.has-sidebar { background: #fff; }
+    body.has-sidebar .app { margin-left: 0; }
+    .container { padding: 0; max-width: none; }
+    .invoice { box-shadow: none; border: 0; padding: 0; max-width: none; }
+    .invoice, .invoice * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+
+<div class="inv-bar no-print">
+    <a class="btn" href="{% url 'reservation_detail' reservation.pk %}">&larr; Back</a>
+    <button type="button" class="btn btn-gold" onclick="window.print()">🖨️ Print / Save as PDF</button>
+</div>
+
+<div class="invoice">
+
+    <div class="inv-top">
+        <div class="inv-brand">
+            <div class="inv-mark">S</div>
+            <div>
+                <h2>StayEase Hotel</h2>
+                <p>Opposite St. John College, Palghar, Maharashtra, India | +91 7385867492</p>
+            </div>
+        </div>
+
+        <div class="inv-meta">
+            <h3>INVOICE</h3>
+            <p>Invoice no: <strong>INV-{{ reservation.id|stringformat:"05d" }}</strong></p>
+            <p>Date: <strong>{{ issued|date:"d M Y" }}</strong></p>
+            <p>Status: <strong>{{ reservation.status }}</strong></p>
+        </div>
+    </div>
+
+    <div class="inv-cols">
+        <div class="inv-box">
+            <h4>Billed to</h4>
+            <p class="name">{{ reservation.guest.first_name }} {{ reservation.guest.last_name }}</p>
+            <p>{{ reservation.guest.email }}</p>
+            <p>{{ reservation.guest.phone_number }}</p>
+        </div>
+
+        <div class="inv-box">
+            <h4>Stay details</h4>
+            <p><strong>Room {{ reservation.room.room_number }}</strong> · {{ reservation.room.room_type }}</p>
+            <p>Check-in: {{ reservation.check_in_date|date:"d M Y" }}</p>
+            <p>Check-out: {{ reservation.check_out_date|date:"d M Y" }}</p>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th class="num">Nights</th>
+                <th class="num">Rate</th>
+                <th class="num">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Room {{ reservation.room.room_number }} ({{ reservation.room.room_type }})</td>
+                <td class="num">{{ reservation.nights }}</td>
+                <td class="num">₹ {{ reservation.room.price_per_night }}</td>
+                <td class="num">₹ {{ reservation.total_price }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="inv-total">
+        <table>
+            <tr><td>Subtotal</td><td class="num">₹ {{ reservation.total_price }}</td></tr>
+            <tr class="grand"><td>Total</td><td class="num">₹ {{ reservation.total_price }}</td></tr>
+        </table>
+    </div>
+
+    <div class="inv-note">
+        Thank you for staying with us. We hope to see you again!
+    </div>
+
+</div>
+
+{% endblock %}

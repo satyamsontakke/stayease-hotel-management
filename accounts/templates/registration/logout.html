@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Logout{% endblock title %}
+
+{% block content %}
+
+<style>
+.bye-wrap { display: flex; justify-content: center; padding: 50px 0; }
+
+.bye-box {
+    max-width: 460px;
+    width: 100%;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 44px 34px;
+}
+
+.bye-emoji { font-size: 54px; }
+.bye-box h2 { font-size: 28px; margin: 12px 0 10px; }
+.bye-box p { color: var(--muted); margin: 0 0 26px; }
+</style>
+
+<div class="bye-wrap">
+    <div class="bye-box">
+        <div class="bye-emoji">👋</div>
+        <h2>You are logged out</h2>
+        <p>Thank you for using StayEase Hotel Management. We hope to see you again soon.</p>
+        <a href="{% url 'login' %}" class="btn btn-gold">🔐 Login again</a>
+    </div>
+</div>
+
+{% endblock %}

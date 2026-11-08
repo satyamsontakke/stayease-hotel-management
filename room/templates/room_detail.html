@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Room {{ room.room_number }}{% endblock title %}
+
+{% block content %}
+
+<style>
+.back-link { display: inline-block; margin-bottom: 14px; color: var(--muted); text-decoration: none; font-size: 14px; }
+.back-link:hover { color: var(--navy-800); }
+
+.room-hero {
+    background: linear-gradient(135deg, var(--navy-800), var(--navy-600));
+    color: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+        background-color: var(--navy-800);
+    background-size: cover;
+    background-position: center;
+    min-height: 190px;
+}
+
+.room-hero small { display: block; color: var(--gold-400); letter-spacing: .12em; text-transform: uppercase; font-size: 12px; margin-bottom: 6px; }
+.room-hero h2 { color: #fff; font-size: 42px; margin: 0; line-height: 1; }
+.room-hero .rtype { margin-top: 8px; color: #c9d4e8; font-size: 16px; }
+
+.room-hero .price { text-align: right; }
+.room-hero .price strong { font-family: 'Playfair Display', serif; font-size: 34px; color: var(--gold-400); }
+.room-hero .price span { display: block; color: #c9d4e8; font-size: 13px; margin-bottom: 10px; }
+.room-hero .price span.status { display: inline-block; margin-bottom: 0; font-size: 13px; }
+.room-hero .price span.status.available { color: var(--ok); }
+.room-hero .price span.status.booked { color: var(--bad); }
+
+.sec-title { font-size: 22px; margin: 10px 0 14px; }
+
+.table-wrap { overflow-x: auto; }
+</style>
+
+<a class="back-link" href="{% url 'room_list' %}">&larr; All rooms</a>
+
+<div class="room-hero" {% if room.image %}style="background-image: linear-gradient(90deg, rgba(8,22,40,.85), rgba(8,22,40,.35)), url('{{ room.image.url }}')"{% endif %}>
+    <div>
+        <small>Room</small>
+        <h2>{{ room.room_number }}</h2>
+        <div class="rtype">{{ room.room_type }}</div>
+    </div>
+
+    <div class="price">
+        <strong>₹ {{ room.price_per_night }}</strong>
+        <span>per night</span>
+
+        {% if room.is_booked_now %}
+            <span class="status booked">Booked now</span>
+        {% else %}
+            <span class="status available">Available now</span>
+        {% endif %}
+    </div>
+</div>
+
+<p>
+    <a class="btn btn-gold" href="{% url 'reservation_create' %}?room_id={{ room.pk }}">+ Book this room</a>
+    {% if is_admin %}
+    <a class="btn" href="{% url 'room_update' room.pk %}">✏️ Edit room</a>
+    {% endif %}
+</p>
+
+{% if can_see_bookings %}
+<h3 class="sec-title">Reservations</h3>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Guest</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.guest.first_name }} {{ reservation.guest.last_name }}</td>
+                <td>{{ reservation.check_in_date|date:"d M Y" }}</td>
+                <td>{{ reservation.check_out_date|date:"d M Y" }}</td>
+                <td><a href="{% url 'reservation_detail' reservation.pk %}">View</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No reservations for this room yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p style="margin-top:16px;">
+    <a class="linkx" href="{% url 'reservation_list' %}?room_number={{ room.room_number }}">View all reservations</a>
+</p>
+{% endif %}
+
+{% endblock content %}

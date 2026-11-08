@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Guest Detail{% endblock title %}
+
+{% block content %}
+
+<style>
+.back-link { display: inline-block; margin-bottom: 14px; color: var(--muted); text-decoration: none; font-size: 14px; }
+.back-link:hover { color: var(--navy-800); }
+
+.guest-hero {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.guest-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+    color: var(--navy-900);
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.guest-hero h2 { margin: 0; font-size: 28px; }
+.guest-hero p { margin: 2px 0 0; color: var(--muted); }
+
+.guest-actions { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn-danger { background: var(--bad); }
+.btn-danger:hover { background: #a52f23; }
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.info-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+}
+
+.info-box span {
+    display: block;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+}
+
+.info-box strong { color: var(--navy-800); font-weight: 600; word-break: break-word; }
+
+.sec-title { font-size: 22px; margin: 0 0 14px; }
+.table-wrap { overflow-x: auto; }
+</style>
+
+<a class="back-link" href="{% url 'guest_list' %}">&larr; All guests</a>
+
+<div class="guest-hero">
+    <div class="guest-avatar">{{ guest.first_name|slice:":1"|upper }}</div>
+
+    <div>
+        <h2>{{ guest.first_name }} {{ guest.last_name }}</h2>
+        <p>{{ guest.email }}</p>
+    </div>
+
+    <div class="guest-actions">
+        <a class="btn btn-gold" href="{% url 'reservation_create' %}?guest_id={{ guest.id }}">🏨 Make Reservation</a>
+        <a class="btn" href="{% url 'guest_update' guest.pk %}">Edit</a>
+        <a class="btn btn-danger" href="{% url 'guest_delete' guest.pk %}">Delete</a>
+    </div>
+</div>
+
+<div class="info-grid">
+    <div class="info-box"><span>Phone</span><strong>{{ guest.phone_number }}</strong></div>
+    <div class="info-box"><span>Government ID</span><strong>{{ guest.government_id }}</strong></div>
+    <div class="info-box"><span>Address</span><strong>{{ guest.address }}</strong></div>
+</div>
+
+<h3 class="sec-title">Reservations</h3>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Room</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in guest.reservation_set.all %}
+            <tr>
+                <td>Room {{ r.room.room_number }}</td>
+                <td>{{ r.check_in_date|date:"d M Y" }}</td>
+                <td>{{ r.check_out_date|date:"d M Y" }}</td>
+                <td><a href="{% url 'reservation_detail' r.pk %}">View</a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No reservations yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock content %}

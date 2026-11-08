@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Reservation{% endblock %}
+
+{% block content %}
+
+<style>
+.del-wrap { display: flex; justify-content: center; padding: 30px 0; }
+
+.del-box {
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 40px 32px;
+}
+
+.del-box .emoji { font-size: 48px; }
+.del-box h2 { font-size: 26px; margin: 10px 0 8px; }
+.del-box p { color: var(--muted); margin: 0 0 8px; }
+.del-box .what { color: var(--navy-800); font-weight: 600; margin-bottom: 22px; }
+
+.del-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.del-actions form { margin: 0; max-width: none; }
+.del-actions .btn-danger { background: var(--bad); color: #fff; }
+.del-actions .btn-danger:hover { background: #a52f23; color: #fff; }
+</style>
+
+<div class="del-wrap">
+    <div class="del-box">
+        <div class="emoji">🗑️</div>
+        <h2>Delete this reservation?</h2>
+        <p>This permanently removes the booking. To keep a record, use "Cancel booking" instead.</p>
+        <p class="what">
+            #{{ object.id }} · Room {{ object.room.room_number }} ·
+            {{ object.guest.first_name }} {{ object.guest.last_name }}<br>
+            {{ object.check_in_date|date:"d M Y" }} &rarr; {{ object.check_out_date|date:"d M Y" }}
+        </p>
+
+        <div class="del-actions">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Yes, delete</button>
+            </form>
+            <a class="btn" href="{% url 'reservation_detail' object.pk %}">No, go back</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

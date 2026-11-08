@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Reservation #{{ reservation.id }}{% endblock %}
+
+{% block content %}
+
+<style>
+.back-link { display: inline-block; margin-bottom: 14px; color: var(--muted); text-decoration: none; font-size: 14px; }
+.back-link:hover { color: var(--navy-800); }
+
+.res-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    max-width: 820px;
+}
+
+.res-head {
+    background: linear-gradient(135deg, var(--navy-800), var(--navy-600));
+    color: #fff;
+    padding: 24px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.res-head small { color: var(--gold-400); letter-spacing: .12em; text-transform: uppercase; font-size: 12px; }
+.res-head h2 { color: #fff; margin: 4px 0 0; font-size: 28px; }
+
+.st {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.st-confirmed   { background: var(--gold-100); color: #7a5f0a; }
+.st-checked_in  { background: var(--ok-bg);    color: var(--ok); }
+.st-checked_out { background: #ececec;         color: #555; }
+.st-cancelled   { background: var(--bad-bg);   color: var(--bad); }
+
+.res-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 26px 28px;
+}
+
+.res-item span { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.res-item strong { font-size: 17px; color: var(--navy-800); font-weight: 600; }
+
+.res-total {
+    margin: 0 28px 24px;
+    padding: 18px 20px;
+    background: var(--gold-100);
+    border: 1px solid #ead9a0;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.res-actions { padding: 0 28px 28px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.res-actions form { margin: 0; max-width: none; }
+.res-actions .btn-ok { background: var(--ok); color: #fff; }
+.res-actions .btn-ok:hover { background: #17704a; color: #fff; }
+.res-actions .btn-danger { background: var(--bad); color: #fff; }
+.res-actions .btn-danger:hover { background: #a52f23; color: #fff; }
+.res-actions .btn-ghost { background: transparent; color: var(--bad); border-color: var(--bad); }
+.res-actions .btn-ghost:hover { background: var(--bad-bg); color: var(--bad); }
+</style>
+
+<a class="back-link" href="{% url 'reservation_list' %}">&larr; All reservations</a>
+
+<div class="res-card">
+
+    <div class="res-head">
+        <div>
+            <small>Reservation</small>
+            <h2>#{{ reservation.id }}</h2>
+        </div>
+        <span class="st st-{{ reservation.state|lower }}">{{ reservation.status }}</span>
+    </div>
+
+    <div class="res-grid">
+        <div class="res-item"><span>Room</span><strong>{{ reservation.room.room_number }} · {{ reservation.room.room_type }}</strong></div>
+        <div class="res-item"><span>Guest</span><strong>{{ reservation.guest.first_name }} {{ reservation.guest.last_name }}</strong></div>
+        <div class="res-item"><span>Check-in</span><strong>{{ reservation.check_in_date|date:"d M Y" }}</strong></div>
+        <div class="res-item"><span>Check-out</span><strong>{{ reservation.check_out_date|date:"d M Y" }}</strong></div>
+        <div class="res-item"><span>Nights</span><strong>{{ reservation.nights }}</strong></div>
+        <div class="res-item"><span>Rate</span><strong>₹ {{ reservation.room.price_per_night }} / night</strong></div>
+    </div>
+
+    <div class="res-total">
+        <small>Total for {{ reservation.nights }} night{{ reservation.nights|pluralize }}</small>
+        <strong>₹ {{ reservation.total_price }}</strong>
+    </div>
+
+    {% if reservation.additional %}
+    <div class="res-notes">
+        <span class="res-notes-label">Special requests</span>
+        <div class="res-notes-text">{{ reservation.additional|linebreaksbr }}</div>
+    </div>
+    {% endif %}
+
+        <div class="res-actions">
+
+        {% if can_checkin %}
+        <form method="post" action="{% url 'reservation_action' reservation.pk 'checkin' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ok">✔ Check-in</button>
+        </form>
+        {% endif %}
+
+        {% if can_checkout %}
+        <form method="post" action="{% url 'reservation_action' reservation.pk 'checkout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ok">🚪 Check-out</button>
+        </form>
+        {% endif %}
+
+        {% if can_edit %}
+        <a href="{% url 'reservation_update' reservation.id %}" class="btn btn-gold">Edit reservation</a>
+        {% endif %}
+
+        {% if can_cancel %}
+        <form method="post" action="{% url 'reservation_action' reservation.pk 'cancel' %}"
+              onsubmit="return confirm('Cancel this booking?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-ghost">Cancel booking</button>
+        </form>
+        {% endif %}
+
+        {% if is_admin %}
+        <a href="{% url 'reservation_delete' reservation.pk %}" class="btn btn-danger">Delete</a>
+        {% endif %}
+
+        {% if reservation.state != 'CANCELLED' %}
+        <a class="btn-gold" href="{% url 'reservation_invoice' reservation.pk %}">🧾 Invoice</a>
+        {% endif %}
+
+        <a href="{% url 'reservation_list' %}" class="btn">Back to list</a>
+    </div>
+
+</div>
+
+{% endblock %}

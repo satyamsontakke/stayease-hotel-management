@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock title %}
+
+{% block content %}
+
+<style>
+.dash-hello { margin-bottom: 26px; }
+.dash-hello h2 { font-size: 30px; margin: 0 0 4px; }
+.dash-hello p { margin: 0; color: var(--muted); }
+
+.dash-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 18px;
+    margin-bottom: 26px;
+}
+
+.dash-stat {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .18s, box-shadow .18s;
+}
+
+.dash-stat::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--accent, var(--gold-500));
+}
+
+.dash-stat:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(8, 22, 40, .12); }
+
+.dash-stat .ico {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    font-size: 20px;
+    background: var(--tint, var(--gold-100));
+    margin-bottom: 14px;
+}
+
+.dash-stat .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--navy-800);
+    line-height: 1;
+}
+
+.dash-stat .lbl { margin-top: 6px; font-size: 13.5px; color: var(--muted); font-weight: 500; }
+
+.s-rooms   { --accent: var(--navy-600); --tint: #e3ebf7; }
+.s-guests  { --accent: #7a5cc9;        --tint: #ece6fa; }
+.s-resv    { --accent: var(--gold-500); --tint: var(--gold-100); }
+.s-avail   { --accent: var(--ok);      --tint: var(--ok-bg); }
+.s-booked  { --accent: var(--bad);     --tint: var(--bad-bg); }
+
+.dash-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.dash-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px;
+}
+
+.dash-card h3 { font-size: 19px; margin-bottom: 16px; }
+
+.donut-wrap { display: grid; place-items: center; padding: 6px 0 14px; }
+
+.donut {
+    --occ: 0;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: conic-gradient(var(--gold-500) calc(var(--occ) * 1%), #e9e5d8 0);
+    display: grid; place-items: center;
+}
+
+.donut-hole {
+    width: 126px; height: 126px;
+    border-radius: 50%;
+    background: var(--surface);
+    display: grid; place-items: center;
+    text-align: center;
+}
+
+.donut-hole strong { font-family: 'Playfair Display', serif; font-size: 34px; color: var(--navy-800); line-height: 1; }
+.donut-hole span { font-size: 12px; color: var(--muted); }
+
+.legend { display: flex; justify-content: center; gap: 18px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+
+.today-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+
+.today-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 10px;
+}
+
+.today-title b {
+    background: var(--navy-800); color: #fff;
+    border-radius: 999px; padding: 1px 9px; font-size: 12px;
+}
+
+.today-item {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .15s, background .15s;
+}
+
+.today-item:hover { border-color: var(--gold-500); background: var(--gold-100); }
+.today-item strong { display: block; font-size: 14.5px; }
+.today-item small { color: var(--muted); }
+
+.room-pill {
+    background: var(--navy-800); color: #fff;
+    border-radius: 8px; padding: 4px 10px;
+    font-size: 13px; font-weight: 600; white-space: nowrap;
+}
+
+.empty { color: var(--muted); font-size: 14px; padding: 10px 2px; }
+
+.quick { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+
+.my-booking {
+    background: linear-gradient(135deg, var(--navy-800), var(--navy-700));
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 26px;
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+}
+
+.my-booking h3 { color: var(--gold-400); margin-bottom: 10px; }
+.my-booking .big { font-family: 'Playfair Display', serif; font-size: 26px; }
+.my-booking p { margin: 4px 0 0; color: #c9d4e8; }
+
+@media (max-width: 900px) {
+    .dash-grid, .today-cols { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="dash-hello">
+    <h2>Welcome, {{ request.user.get_full_name|default:request.user.username }}</h2>
+    <p>{{ today|date:"l, d F Y" }}</p>
+</div>
+
+{% if is_manager %}
+
+<div class="dash-stats">
+    <a class="dash-stat s-rooms" href="{% url 'room_list' %}">
+        <div class="ico">🏨</div>
+        <div class="num">{{ total_rooms }}</div>
+        <div class="lbl">Total Rooms</div>
+    </a>
+    <a class="dash-stat s-guests" href="{% url 'guest_list' %}">
+        <div class="ico">👥</div>
+        <div class="num">{{ total_guests }}</div>
+        <div class="lbl">Total Guests</div>
+    </a>
+    <a class="dash-stat s-resv" href="{% url 'reservation_list' %}">
+        <div class="ico">📅</div>
+        <div class="num">{{ total_reservations }}</div>
+        <div class="lbl">Total Reservations</div>
+    </a>
+    <a class="dash-stat s-avail" href="{% url 'available_rooms' %}">
+        <div class="ico">🟢</div>
+        <div class="num">{{ available_rooms }}</div>
+        <div class="lbl">Available Now</div>
+    </a>
+    <a class="dash-stat s-booked" href="{% url 'booked_rooms' %}">
+        <div class="ico">🔴</div>
+        <div class="num">{{ booked_rooms }}</div>
+        <div class="lbl">Booked Now</div>
+    </a>
+</div>
+
+<div class="dash-grid">
+
+    <div class="dash-card">
+        <h3>Occupancy</h3>
+        <div class="donut-wrap">
+            <div class="donut" style="--occ: {{ occupancy }};">
+                <div class="donut-hole">
+                    <div><strong>{{ occupancy }}%</strong><br><span>occupied</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="legend">
+            <span><i style="background: var(--gold-500)"></i>Booked {{ booked_rooms }}</span>
+            <span><i style="background: #e9e5d8"></i>Free {{ available_rooms }}</span>
+        </div>
+    </div>
+
+    <div class="dash-card">
+        <h3>Today</h3>
+        <div class="today-cols">
+
+            <div>
+                <div class="today-title">Check-ins <b>{{ checkins|length }}</b></div>
+                {% for r in checkins %}
+                <a class="today-item" href="{% url 'reservation_detail' r.pk %}">
+                    <span><strong>{{ r.guest.first_name }} {{ r.guest.last_name }}</strong><small>{{ r.guest.phone_number }}</small></span>
+                    <span class="room-pill">Room {{ r.room.room_number }}</span>
+                </a>
+                {% empty %}
+                <div class="empty">No check-ins today.</div>
+                {% endfor %}
+            </div>
+
+            <div>
+                <div class="today-title">Check-outs <b>{{ checkouts|length }}</b></div>
+                {% for r in checkouts %}
+                <a class="today-item" href="{% url 'reservation_detail' r.pk %}">
+                    <span><strong>{{ r.guest.first_name }} {{ r.guest.last_name }}</strong><small>{{ r.guest.phone_number }}</small></span>
+                    <span class="room-pill">Room {{ r.room.room_number }}</span>
+                </a>
+                {% empty %}
+                <div class="empty">No check-outs today.</div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <div class="quick">
+            <a class="btn btn-gold" href="{% url 'reservation_create' %}">+ New Reservation</a>
+            <a class="btn" href="{% url 'guest_create' %}">+ Add Guest</a>
+            <a class="btn" href="{% url 'calendar' %}">View Calendar</a>
+        </div>
+    </div>
+
+</div>
+
+{% else %}
+
+{% if my_next %}
+<div class="my-booking">
+    <h3>Your next stay</h3>
+    <div class="big">Room {{ my_next.room.room_number }} · {{ my_next.room.room_type }}</div>
+    <p>{{ my_next.check_in_date|date:"d M Y" }} &rarr; {{ my_next.check_out_date|date:"d M Y" }}</p>
+    <p style="margin-top:14px;"><a class="btn btn-gold" href="{% url 'reservation_detail' my_next.pk %}">View booking</a></p>
+</div>
+{% endif %}
+
+<div class="dash-stats">
+    <a class="dash-stat s-avail" href="{% url 'available_rooms' %}">
+        <div class="ico">🟢</div>
+        <div class="num">{{ available_rooms }}</div>
+        <div class="lbl">Rooms available today</div>
+    </a>
+    <a class="dash-stat s-resv" href="{% url 'reservation_list' %}">
+        <div class="ico">📅</div>
+        <div class="lbl">My Reservations</div>
+    </a>
+    <a class="dash-stat s-rooms" href="{% url 'search_rooms' %}">
+        <div class="ico">🔍</div>
+        <div class="lbl">Search rooms by date</div>
+    </a>
+</div>
+
+<a class="btn btn-gold" href="{% url 'reservation_create' %}">+ Book a Room</a>
+
+{% endif %}
+
+{% endblock content %}

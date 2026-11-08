@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+
+<style>
+.form-wrapper { display: flex; justify-content: center; padding: 10px 0 30px; }
+
+.form-card {
+    width: 100%;
+    max-width: 620px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.form-card-head {
+    background: linear-gradient(135deg, var(--navy-800), var(--navy-600));
+    padding: 22px 28px;
+}
+
+.form-card-head h2 { margin: 0; color: #fff; font-size: 26px; }
+
+.form-card-body { padding: 10px 28px 28px; }
+
+main .form-card-body form { max-width: none; }
+
+.field { margin-bottom: 6px; }
+.field label { margin-top: 16px; }
+.field .hint { color: var(--muted); font-size: 13px; margin-top: 5px; }
+.field .err { color: var(--bad); font-size: 13px; margin-top: 5px; font-weight: 500; }
+.field.has-error input, .field.has-error select, .field.has-error textarea { border-color: var(--bad); }
+
+input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed #cfc8b5;
+    border-radius: 10px;
+    background: #fbfaf6;
+    font: inherit;
+}
+
+.form-errors {
+    background: var(--bad-bg);
+    border: 1px solid #f1c5bf;
+    color: var(--bad);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.form-actions { display: flex; gap: 12px; align-items: center; margin-top: 28px; flex-wrap: wrap; }
+.form-actions .btn-gold { padding: 12px 26px; }
+.form-actions button.btn-gold {
+    background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+    color: var(--navy-900);
+}
+.form-actions button.btn-gold:hover { background: var(--gold-400); color: var(--navy-900); }
+.form-actions .cancel { color: var(--muted); text-decoration: none; font-weight: 500; }
+.form-actions .cancel:hover { color: var(--navy-800); }
+</style>
+
+<div class="form-wrapper">
+    <div class="form-card">
+
+        <div class="form-card-head">
+            <h2>{{ title }}</h2>
+        </div>
+
+        <div class="form-card-body">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+                </div>
+                {% endif %}
+
+                {% for field in form %}
+                    {% if field.is_hidden %}
+                        {{ field }}
+                    {% else %}
+                    <div class="field {% if field.errors %}has-error{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+
+                        {% if field.help_text %}
+                        <div class="hint">{{ field.help_text|safe }}</div>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                        <div class="err">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-gold">{{ title }}</button>
+                    <a href="javascript:history.back()" class="cancel">Cancel</a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock content %}
