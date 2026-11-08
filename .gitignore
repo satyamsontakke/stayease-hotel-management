@@ -37,3 +37,5 @@ Pipfile.lock
 # Backup databases and secrets
 *.sqlite3
 .env
+
+staticfiles/
