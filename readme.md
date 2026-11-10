@@ -3,6 +3,10 @@
 A Django web app to manage hotel rooms, guests and reservations, with separate
 access for **Admin**, **Staff** and **Customer** roles.
 
+**Live demo:** https://satyamsontakke.pythonanywhere.com
+
+> The live demo uses sample data. To try the Customer view, register a new account on the site.
+
 ## Features
 
 - **Roles:** Admin, Staff and Customer, each with their own menu and permissions
